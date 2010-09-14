@@ -22,9 +22,10 @@
  *
  */
 
-#include <config.h>
+//#include <config.h>
 
 #define __REGb(x)	(*(volatile unsigned char *)(x))
+#define __REGw(x) (*(volatile unsigned short *)(x)) 
 #define __REGi(x)	(*(volatile unsigned int *)(x))
 #define NF_BASE		0x4e000000
 #define NFCONF		__REGi(NF_BASE + 0x0)
@@ -32,6 +33,8 @@
 #define NFADDR		__REGb(NF_BASE + 0x8)
 #define NFDATA		__REGb(NF_BASE + 0xc)
 #define NFSTAT		__REGb(NF_BASE + 0x10)
+
+#define NFDATA16 		__REGw(NF_BASE + 0x10) 
 
 #define BUSY 1
 inline void wait_idle(void) {
@@ -49,7 +52,10 @@ int
 nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
 {
     int i, j;
+	unsigned int page_num;
+	unsigned short *ptr16 = (unsigned short *)buf; 
 
+	
     if ((start_addr & NAND_BLOCK_MASK) || (size & NAND_BLOCK_MASK)) {
         return -1;	/* invalid alignment */
     }
@@ -59,21 +65,27 @@ nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
     for(i=0; i<10; i++);
 
     for(i=start_addr; i < (start_addr + size);) {
+
+	page_num = i >> 11;
       /* READ0 */
       NFCMD = 0;
 
       /* Write Address */
-      NFADDR = i & 0xff;
-      NFADDR = (i >> 9) & 0xff;
-      NFADDR = (i >> 17) & 0xff;
-      NFADDR = (i >> 25) & 0xff;
+      NFADDR = 0;
+	NFADDR = 0;
+	NFADDR = page_num & 0xff;
+	NFADDR = (i >> 11) & 0xff;
+	NFADDR = (i >> 19) & 0xff;
+
+	NFCMD = 0x30;
 
       wait_idle();
 
-      for(j=0; j < NAND_SECTOR_SIZE; j++, i++) {
-	*buf = (NFDATA & 0xff);
-	buf++;
-      }
+      for (i = 0; i < (2048>>1); i++) 
+	{ 
+		*ptr16 = NFDATA16; 
+		ptr16++; 
+	}
     }
 
     /* chip Disable */

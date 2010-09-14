@@ -327,6 +327,8 @@ copy_myself:
 */
 	bl	nand_read_ll
 
+
+
 	tst	r0, #0x0
 	beq	ok_nand_read
 

@@ -54,6 +54,7 @@ nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
     int i, j;
 	unsigned int page_num;
 	unsigned short *ptr16 = (unsigned short *)buf; 
+	unsigned short ustmp;
 
 	
     if ((start_addr & NAND_BLOCK_MASK) || (size & NAND_BLOCK_MASK)) {
@@ -83,7 +84,8 @@ nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
 
       for (i = 0; i < (2048>>1); i++) 
 	{ 
-		*ptr16 = NFDATA16; 
+		ustmp = NFDATA16;
+		*ptr16 = ustmp; 
 		ptr16++; 
 	}
     }

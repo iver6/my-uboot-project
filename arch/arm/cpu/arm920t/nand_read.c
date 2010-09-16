@@ -73,10 +73,15 @@ nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
 
       /* Write Address */
       NFADDR = 0;
+	for(i=0; i<10; i++);
 	NFADDR = 0;
+	for(i=0; i<10; i++);
 	NFADDR = page_num & 0xff;
+	for(i=0; i<10; i++);
 	NFADDR = (i >> 11) & 0xff;
-	NFADDR = (i >> 19) & 0xff;
+	for(i=0; i<10; i++);
+	NFADDR = (i >> 19) & 0x01;
+	for(i=0; i<10; i++);
 
 	NFCMD = 0x30;
 

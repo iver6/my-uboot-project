@@ -62,8 +62,11 @@ nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
     }
 
     /* chip Enable */
-    NFCONF &= ~0x800;
+	NFCONF &= ~(1 << 1);
+	NFCMD = 0xff;	
     for(i=0; i<10; i++);
+
+	wait_idle();
 
     for(i=start_addr; i < (start_addr + size);) {
 
@@ -96,7 +99,7 @@ nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
     }
 
     /* chip Disable */
-    NFCONF |= 0x800;	/* chip disable */
+    NFCONF |= 0x2;	/* chip disable */
 
     return 0;
 }
